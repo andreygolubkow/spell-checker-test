@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="MySpell.BusinessLogic.Tests/MySpell.BusinessLogic.Tests.csproj" />
+  <Project Path="MySpell.BusinessLogic/MySpell.BusinessLogic.csproj" />
+  <Project Path="MySpell.CLI/MySpell.CLI.csproj" />
+</Solution>
