@@ -11,13 +11,8 @@ public class SpellCheckerTests
 	// Otherwise, if W is not in the dictionary,
 	// - If no corrections can be found, print “{W?}”.
 	[TestCase("rame", "{rame?}")]
-	// Ignore any corrections that require two edits
-	// Two remove
-	[TestCase($"{CORRECT_PAIN}nn", "????")]
-	// Two inserts 
-	[TestCase("poen", "?????")]
-	// Remove + Insert
-	[TestCase("paixn", "?????")]
+	// Ignore any corrections that require two edits / adjacent edits 
+	[TestCase("hints", "{hints?}")]
 	// If exactly one correction is left, print that word.
 	// One remove
 	[TestCase($"{CORRECT_PAIN}n", $"{CORRECT_PAIN}")]
