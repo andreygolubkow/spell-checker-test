@@ -4,6 +4,15 @@ public class Vocabulary : IVocabulary
 {
 	private HashSet<string> _plainWords;
 	private IDictionary<string, List<string>> _dictionary;
+	
+	// TODO: We need here some super-fast hash,
+	// to understand the chance of finding word in out cache
+	// because probably, if can say we don't have word with two edits at all
+	// then we don't have to search it. 
+	
+	// TODO: Also, we need to think about saving a cache on disk, to don't fill
+	// the dictionary for second run
+	
 
 	public Vocabulary(HashSet<string> plainWords, IDictionary<string,List<string>> dictionary)
 	{
@@ -11,9 +20,9 @@ public class Vocabulary : IVocabulary
 		_dictionary = dictionary;
 	}
 	
-	public string[] GetBestMatchEntry()
+	public string[] GetBestMatchEntry(string input, int depth)
 	{
-		throw new NotImplementedException();
+		
 	}
 
 	public static Vocabulary BuildVocabulary(string[] knownWords)
@@ -41,6 +50,8 @@ public class Vocabulary : IVocabulary
 				dictionary[parent].Add(key);
 				dictionary[key] = new List<string>();
 			}
+
+			plainWords.Add(word);
 		}
 
 		return new Vocabulary(plainWords, dictionary);
