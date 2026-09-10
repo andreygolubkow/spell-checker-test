@@ -19,19 +19,31 @@ public class Vocabulary : IVocabulary
 		_plainWords = plainWords;
 		_dictionary = dictionary;
 	}
+
+	public bool IsKnown(string word)
+	{
+		return _plainWords.Contains(word);
+	}
 	
 	public string[] GetBestMatch(string input, int depth)
 	{
-		string biggestExactMatch = null;
+ 		// Take left written part
+		string leftExactMatch = null;
 		
 		for (int i = 0; i < input.Length; i++)
 		{
 			var word = input[0..i];
 			if (_dictionary.ContainsKey(word))
 			{
-				biggestExactMatch = word;
+				leftExactMatch = word;
 			}
 		}
+		// TODO: need to cover case, when first letter - wrong, second letter - right
+		// Trying to find right word
+		var candidates = _dictionary[leftExactMatch];
+		
+		
+		
 
 		return [];
 	}
