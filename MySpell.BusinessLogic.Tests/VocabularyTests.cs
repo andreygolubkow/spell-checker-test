@@ -12,4 +12,15 @@ public class VocabularyTests
 
 		Console.WriteLine("....");
 	}
+
+	[TestCase("testabb")]
+	public void GetBestMatchTest(string input)
+	{
+		var words = new string[] { "test", "testability", "testosterone", "bug", "on", "off", };
+		
+		var vocabulary = Vocabulary.BuildVocabulary(words);
+		var r = vocabulary.GetBestMatch(input,2 );
+
+		Console.WriteLine("....");
+	}
 }

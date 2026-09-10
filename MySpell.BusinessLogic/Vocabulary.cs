@@ -6,7 +6,7 @@ public class Vocabulary : IVocabulary
 	private IDictionary<string, List<string>> _dictionary;
 	
 	// TODO: We need here some super-fast hash,
-	// to understand the chance of finding word in out cache
+	// to understand the chance of finding word in our cache
 	// because probably, if can say we don't have word with two edits at all
 	// then we don't have to search it. 
 	
@@ -20,9 +20,20 @@ public class Vocabulary : IVocabulary
 		_dictionary = dictionary;
 	}
 	
-	public string[] GetBestMatchEntry(string input, int depth)
+	public string[] GetBestMatch(string input, int depth)
 	{
+		string biggestExactMatch = null;
 		
+		for (int i = 0; i < input.Length; i++)
+		{
+			var word = input[0..i];
+			if (_dictionary.ContainsKey(word))
+			{
+				biggestExactMatch = word;
+			}
+		}
+
+		return [];
 	}
 
 	public static Vocabulary BuildVocabulary(string[] knownWords)
