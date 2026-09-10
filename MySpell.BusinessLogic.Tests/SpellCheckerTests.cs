@@ -23,7 +23,7 @@ public class SpellCheckerTests
 	[TestCase("mainy", $"{{{FEW_CORRECTIONS_WORDS}}}")]
 	public void Process_GeneralCases(string word, string expectedResult)
 	{
-		var instance = new SpellChecker();
+		var instance = new SpellChecker(null);
 
 		var result = instance.ProcessWord(word);
 

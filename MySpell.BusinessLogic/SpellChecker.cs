@@ -2,8 +2,14 @@ namespace MySpell.BusinessLogic;
 
 public class SpellChecker : ISpellChecker
 {
+	private readonly IVocabulary _vocabulary;
 	private readonly char[] _unsupportedChars = [' '];
-	
+
+	public SpellChecker(IVocabulary vocabulary)
+	{
+		_vocabulary = vocabulary;
+	}
+
 	public string ProcessWord(string word)
 	{
 		if (HasUnsupportedChars(word))
