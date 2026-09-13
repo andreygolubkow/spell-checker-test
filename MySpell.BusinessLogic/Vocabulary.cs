@@ -35,14 +35,16 @@ public class Vocabulary : IVocabulary
 		}
 		
 		var stack = new Stack<Candidate>();
+		var result = new HashSet<string>();
 
-		stack.Push(new Candidate("", 0, CorrectionType.Insert));
+		stack.Push(new Candidate("", 0, CorrectionType.None));
 		
 		while (stack.TryPop(out var current))
 		{
 			if (current.Index == input.Length && IsKnown(current.Word))
 			{
-				return [current.Word];
+				result.Add(current.Word);
+				continue;
 			}
 			
 			if (!_dictionary.TryGetValue(current.Word, out var children))
@@ -52,18 +54,19 @@ public class Vocabulary : IVocabulary
 			
 			foreach (var child in children)
 			{
-				if (current.Index < input.Length && child == input[current.Index].ToString())
+				if (current.Index < input.Length && child[^1] == input[current.Index])
 				{
-					stack.Push(new Candidate(current.Word + child, current.Index + 1, CorrectionType.None));
+					stack.Push(new Candidate(child, current.Index + 1, CorrectionType.None));
 				}
-				else if (current.Index < input.Length && current.CorrectionType != CorrectionType.Insert)
+				
+				if (current.Index < input.Length && current.CorrectionType != CorrectionType.Insert)
 				{
-					stack.Push(new Candidate(current.Word + child, current.Index + 1, CorrectionType.Insert));
+					stack.Push(new Candidate(child, current.Index, CorrectionType.Insert));
 				}
 			}
 		}
 
-		return stack.Select(c => c.Word).ToArray();
+		return result.ToArray();
 	}
 
 	public static Vocabulary BuildVocabulary(string[] knownWords)

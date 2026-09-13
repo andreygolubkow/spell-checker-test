@@ -14,7 +14,7 @@ public class VocabularyTests
 	}
 
 	//[TestCase("testabb")]
-	[TestCase("tast")]
+	[TestCase("tst")]
 	public void GetBestMatchTest(string input)
 	{
 		var words = new string[] { "test", "testability", "testosterone", "bug", "on", "off", };
