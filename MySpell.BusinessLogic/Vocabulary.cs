@@ -30,46 +30,52 @@ public class Vocabulary : IVocabulary
  		// Take left written part
 		string leftExactMatch = null;
 		
-		for (int i = 0; i < input.Length; i++)
+		for (int i = 1; i < input.Length; i++)
 		{
 			var word = input[0..i];
 			if (_dictionary.ContainsKey(word))
 			{
 				leftExactMatch = word;
 			}
+			else
+			{
+				break;
+			}
 		}
 		// TODO: need to cover case, when first letter - wrong, second letter - right
 		// Trying to find right word
-		var candidates = _dictionary[leftExactMatch];
 		
 		
-		
+		var firstEdit = _dictionary[leftExactMatch];
+		// test
+		//     a
+		//       bility
+		//     o
+		//       sterone
 
-		return [];
+
+		return firstEdit.ToArray();
 	}
 
 	public static Vocabulary BuildVocabulary(string[] knownWords)
 	{
 		var plainWords = new HashSet<string>();
-		IDictionary<string, List<string>> dictionary = new Dictionary<string, List<string>>();
+		IDictionary<string, List<string>> dictionary = new Dictionary<string, List<string>>()
+		{
+			[""] = new List<string>()
+		};
 
 		for (int i = 0; i < knownWords.Length; i++)
 		{
 			var word = knownWords[i];
 			if (plainWords.Contains(word)) continue;
 
-			for (int j = 0; j < word.Length; j++)
+			for (int j = 1; j < word.Length; j++)
 			{
 				var key = word[0..j];
 				if (dictionary.ContainsKey(key)) continue;
-
-				if (j == 0)
-				{
-					dictionary[$"{word[0]}"] = new List<string>();
-					continue;
-				}
 				
-				var parent = word[0..(j - 1)];
+				var parent = word[..(j - 1)];
 				dictionary[parent].Add(key);
 				dictionary[key] = new List<string>();
 			}
