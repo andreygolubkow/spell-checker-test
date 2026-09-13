@@ -27,34 +27,32 @@ public class Vocabulary : IVocabulary
 	
 	public string[] GetBestMatch(string input, int depth)
 	{
- 		// Take left written part
-		string leftExactMatch = null;
-		
-		for (int i = 1; i < input.Length; i++)
+		if (IsKnown(input))
 		{
-			var word = input[0..i];
-			if (_dictionary.ContainsKey(word))
+			return [input];
+		}
+		
+		var stack = new Stack<string>();
+
+		stack.Push("");
+		
+		while (stack.TryPop(out var current))
+		{
+			if (_dictionary.TryGetValue(current, out var children))
 			{
-				leftExactMatch = word;
+				foreach (var child in children)
+				{
+					stack.Push(child);
+				}
 			}
-			else
+			
+			if (IsKnown(current))
 			{
-				break;
+				return [current];
 			}
 		}
-		// TODO: need to cover case, when first letter - wrong, second letter - right
-		// Trying to find right word
-		
-		
-		var firstEdit = _dictionary[leftExactMatch];
-		// test
-		//     a
-		//       bility
-		//     o
-		//       sterone
 
-
-		return firstEdit.ToArray();
+		return null;
 	}
 
 	public static Vocabulary BuildVocabulary(string[] knownWords)
