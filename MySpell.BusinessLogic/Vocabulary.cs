@@ -1,3 +1,5 @@
+using MySpell.BusinessLogic.Models;
+
 namespace MySpell.BusinessLogic;
 
 public class Vocabulary : IVocabulary
@@ -32,27 +34,36 @@ public class Vocabulary : IVocabulary
 			return [input];
 		}
 		
-		var stack = new Stack<string>();
+		var stack = new Stack<Candidate>();
 
-		stack.Push("");
+		stack.Push(new Candidate("", 0, CorrectionType.Insert));
 		
 		while (stack.TryPop(out var current))
 		{
-			if (_dictionary.TryGetValue(current, out var children))
+			if (current.Index == input.Length && IsKnown(current.Word))
 			{
-				foreach (var child in children)
-				{
-					stack.Push(child);
-				}
+				return [current.Word];
 			}
 			
-			if (IsKnown(current))
+			if (!_dictionary.TryGetValue(current.Word, out var children))
 			{
-				return [current];
+				continue;
+			}
+			
+			foreach (var child in children)
+			{
+				if (current.Index < input.Length && child == input[current.Index].ToString())
+				{
+					stack.Push(new Candidate(current.Word + child, current.Index + 1, CorrectionType.None));
+				}
+				else if (current.Index < input.Length && current.CorrectionType != CorrectionType.Insert)
+				{
+					stack.Push(new Candidate(current.Word + child, current.Index + 1, CorrectionType.Insert));
+				}
 			}
 		}
 
-		return null;
+		return stack.Select(c => c.Word).ToArray();
 	}
 
 	public static Vocabulary BuildVocabulary(string[] knownWords)

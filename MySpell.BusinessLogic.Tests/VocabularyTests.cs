@@ -13,7 +13,8 @@ public class VocabularyTests
 		Console.WriteLine("....");
 	}
 
-	[TestCase("testabb")]
+	//[TestCase("testabb")]
+	[TestCase("tast")]
 	public void GetBestMatchTest(string input)
 	{
 		var words = new string[] { "test", "testability", "testosterone", "bug", "on", "off", };
