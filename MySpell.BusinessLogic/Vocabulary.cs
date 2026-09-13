@@ -71,28 +71,25 @@ public class Vocabulary : IVocabulary
 
 	public static Vocabulary BuildVocabulary(string[] knownWords)
 	{
-		var plainWords = new HashSet<string>();
+		var plainWords = new HashSet<string>(knownWords);
 		IDictionary<string, List<string>> dictionary = new Dictionary<string, List<string>>()
 		{
 			[""] = new List<string>()
 		};
 
-		for (int i = 0; i < knownWords.Length; i++)
+		foreach (var word in plainWords)
 		{
-			var word = knownWords[i];
 			if (plainWords.Contains(word)) continue;
 
 			for (int j = 1; j < word.Length; j++)
 			{
-				var key = word[0..j];
+				var key = j < word.Length-1 ? word[0..j] : word;
 				if (dictionary.ContainsKey(key)) continue;
 				
 				var parent = word[..(j - 1)];
 				dictionary[parent].Add(key);
 				dictionary[key] = new List<string>();
 			}
-
-			plainWords.Add(word);
 		}
 
 		return new Vocabulary(plainWords, dictionary);
