@@ -79,8 +79,6 @@ public class Vocabulary : IVocabulary
 
 		foreach (var word in plainWords)
 		{
-			if (plainWords.Contains(word)) continue;
-
 			for (int j = 1; j < word.Length; j++)
 			{
 				var key = j < word.Length-1 ? word[0..j] : word;

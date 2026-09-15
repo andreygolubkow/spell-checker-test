@@ -10,7 +10,13 @@ public class VocabularyTests
 		
 		var result = Vocabulary.BuildVocabulary(words);
 
-		Console.WriteLine("....");
+		Assert.Multiple(() =>
+		{
+			foreach (var s in words)
+			{
+				Assert.That(result.IsKnown(s), $"{s} word should be known as it's used to build vocabulary.");
+			}
+		});
 	}
 
 	//[TestCase("testabb")]
