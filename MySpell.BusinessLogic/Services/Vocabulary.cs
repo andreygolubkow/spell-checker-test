@@ -4,18 +4,9 @@ namespace MySpell.BusinessLogic;
 
 public class Vocabulary : IVocabulary
 {
-	private HashSet<string> _plainWords;
-	private IDictionary<string, List<string>> _dictionary;
+	private readonly HashSet<string> _plainWords;
+	private readonly IDictionary<string, List<string>> _dictionary;
 	
-	// TODO: We need here some super-fast hash,
-	// to understand the chance of finding word in our cache
-	// because probably, if can say we don't have word with two edits at all
-	// then we don't have to search it. 
-	
-	// TODO: Also, we need to think about saving a cache on disk, to don't fill
-	// the dictionary for second run
-	
-
 	public Vocabulary(HashSet<string> plainWords, IDictionary<string,List<string>> dictionary)
 	{
 		_plainWords = plainWords;
@@ -56,8 +47,8 @@ public class Vocabulary : IVocabulary
 				continue;
 			}
 			
-			if (current.Index < input.Length && current.EditsCount < depth &&
-			    current.CorrectionType != CorrectionType.Delete)
+			if (current.Index < input.Length && current.EditsCount < depth 
+			                                 && current.CorrectionType == CorrectionType.None)
 			{
 				stack.Push(new Candidate(current.Word, current.Index + 1, current.EditsCount + 1, CorrectionType.Delete));
 			}
@@ -69,7 +60,8 @@ public class Vocabulary : IVocabulary
 					stack.Push(new Candidate(child, current.Index + 1, current.EditsCount, CorrectionType.None));
 				}
 				
-				if (current.EditsCount < depth && current.CorrectionType != CorrectionType.Insert && current.Index <= input.Length)
+				if (current.EditsCount < depth && current.Index <= input.Length 
+				                               && current.CorrectionType == CorrectionType.None)
 				{
 					stack.Push(new Candidate(child, current.Index, current.EditsCount + 1, CorrectionType.Insert));
 				}
