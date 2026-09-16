@@ -3,18 +3,16 @@ namespace MySpell.BusinessLogic.Tests;
 [TestFixture]
 public class VocabularyTests
 {
-	private string[] _sharedDictionary = ["test", "testability", "testosterone", "bug", "on", "off"];
+	private string[] _sharedWords = ["test", "testability", "testosterone", "bug", "on", "off"];
 	
 	[Test]
 	public void BuildTest()
 	{
-		var words = new string[] { "test", "testability", "testosterone", "bug", "on", "off", };
-		
-		var result = Vocabulary.BuildVocabulary(words);
+		var result = Vocabulary.BuildVocabulary(_sharedWords);
 
 		Assert.Multiple(() =>
 		{
-			foreach (var s in words)
+			foreach (var s in _sharedWords)
 			{
 				Assert.That(result.IsKnown(s), $"{s} word should be known as it's used to build vocabulary.");
 			}
@@ -31,7 +29,7 @@ public class VocabularyTests
 	[TestCase("tset", "test", "One delete and one insert case")]
 	public void GetBestMatchTest(string input, string candidate, string description)
 	{
-		var vocabulary = Vocabulary.BuildVocabulary(_sharedDictionary);
+		var vocabulary = Vocabulary.BuildVocabulary(_sharedWords);
 		var result = vocabulary.GetBestMatch(input,2 );
 
 		Assert.Multiple(() =>
