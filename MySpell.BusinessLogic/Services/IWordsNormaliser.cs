@@ -1,4 +1,4 @@
-namespace MySpell.BusinessLogic;
+namespace MySpell.BusinessLogic.Services;
 
 public interface IWordsNormaliser
 {

@@ -1,4 +1,4 @@
-namespace MySpell.BusinessLogic.Tests;
+namespace MySpell.BusinessLogic.Tests.Services;
 
 [TestFixture]
 public class VocabularyTests
@@ -82,7 +82,9 @@ public class VocabularyTests
 	public void NearestCorrectionsAreNotAllowedTest(string text)
 	{
 		var vocabulary = Vocabulary.BuildVocabulary(_sharedWords);
+		
 		var result = vocabulary.GetBestMatch(text, 2);
+		
 		Assert.That(result.Length == 0);
 	}
 }

@@ -1,4 +1,6 @@
-﻿namespace MySpell.BusinessLogic.Tests;
+﻿using MySpell.BusinessLogic.Services;
+
+namespace MySpell.BusinessLogic.Tests.Services;
 
 [TestFixture]
 public class SpellCheckerTests

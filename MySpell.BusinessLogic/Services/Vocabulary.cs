@@ -1,4 +1,5 @@
 using MySpell.BusinessLogic.Models;
+using MySpell.BusinessLogic.Services;
 
 namespace MySpell.BusinessLogic;
 
