@@ -74,9 +74,15 @@ public class VocabularyTests
 		});
 	}
 
-	[Test]
-	public void NearestCorrectionsAreNotAllowedTest()
+	[TestCase("tzst")]
+	[TestCase("aatest")]
+	[TestCase("testaa")]
+	[TestCase("st")]
+	[TestCase("te")]
+	public void NearestCorrectionsAreNotAllowedTest(string text)
 	{
-		
+		var vocabulary = Vocabulary.BuildVocabulary(_sharedWords);
+		var result = vocabulary.GetBestMatch(text, 2);
+		Assert.That(result.Length == 0);
 	}
 }
