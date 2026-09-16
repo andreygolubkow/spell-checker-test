@@ -43,7 +43,11 @@ public class Vocabulary : IVocabulary
 		{
 			if (current.Index == input.Length && IsKnown(current.Word))
 			{
-				result.Add(current.Word, current.EditsCount);
+				if (!result.TryGetValue(current.Word, out var existingEdits) || 
+					current.EditsCount < existingEdits)
+				{
+					result[current.Word] = current.EditsCount;
+				}
 				continue;
 			}
 			
