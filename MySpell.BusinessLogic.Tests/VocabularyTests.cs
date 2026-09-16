@@ -38,4 +38,16 @@ public class VocabularyTests
 			Assert.That(result.Contains(candidate), "The correction doesn't contain right correction");
 		});
 	}
+
+	[Test]
+	public void BestCorrectionWinsTest()
+	{
+		
+	}
+
+	[Test]
+	public void NearestCorrectionsAreNotAllowedTest()
+	{
+		
+	}
 }
