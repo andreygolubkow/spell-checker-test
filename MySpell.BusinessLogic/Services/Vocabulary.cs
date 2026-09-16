@@ -37,7 +37,7 @@ public class Vocabulary : IVocabulary
 		var stack = new Stack<Candidate>();
 		var result = new HashSet<string>();
 
-		stack.Push(new Candidate("", 0, CorrectionType.None));
+		stack.Push(new Candidate("", 0, 0, CorrectionType.None));
 		
 		while (stack.TryPop(out var current))
 		{
@@ -52,16 +52,22 @@ public class Vocabulary : IVocabulary
 				continue;
 			}
 			
+			if (current.Index < input.Length && current.EditsCount < depth &&
+			    current.CorrectionType != CorrectionType.Delete)
+			{
+				stack.Push(new Candidate(current.Word, current.Index + 1, current.EditsCount + 1, CorrectionType.Delete));
+			}
+			
 			foreach (var child in children)
 			{
 				if (current.Index < input.Length && child[^1] == input[current.Index])
 				{
-					stack.Push(new Candidate(child, current.Index + 1, CorrectionType.None));
+					stack.Push(new Candidate(child, current.Index + 1, current.EditsCount, CorrectionType.None));
 				}
 				
-				if (current.Index < input.Length && current.CorrectionType != CorrectionType.Insert)
+				if (current.Index < input.Length &&  current.EditsCount < depth && current.CorrectionType != CorrectionType.Insert)
 				{
-					stack.Push(new Candidate(child, current.Index, CorrectionType.Insert));
+					stack.Push(new Candidate(child, current.Index, current.EditsCount + 1, CorrectionType.Insert));
 				}
 			}
 		}

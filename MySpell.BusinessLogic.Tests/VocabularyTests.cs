@@ -18,16 +18,17 @@ public class VocabularyTests
 			}
 		});
 	}
-
-	//[TestCase("testabb")]
-	[TestCase("tst")]
-	public void GetBestMatchTest(string input)
+	
+	[TestCase("test", "test", "Exact match")]
+	[TestCase("tst", "test", "One insert case")]
+	[TestCase("teest", "test", "One delete case")]
+	public void GetBestMatchTest(string input, string candidate, string description)
 	{
 		var words = new string[] { "test", "testability", "testosterone", "bug", "on", "off", };
 		
 		var vocabulary = Vocabulary.BuildVocabulary(words);
 		var r = vocabulary.GetBestMatch(input,2 );
 
-		Console.WriteLine("....");
+		Assert.That(r.Contains(candidate));
 	}
 }
