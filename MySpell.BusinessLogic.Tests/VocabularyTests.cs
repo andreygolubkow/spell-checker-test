@@ -60,7 +60,7 @@ public class VocabularyTests
 	[Test]
 	public void FewBestCorrectionsTest()
 	{
-		string[] words = ["tost", "test"];
+		string[] words = ["tost", "test", "toset"];
 		
 		var vocabulary = Vocabulary.BuildVocabulary(words);
 		

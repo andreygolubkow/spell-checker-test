@@ -35,7 +35,7 @@ public class Vocabulary : IVocabulary
 		}
 		
 		var stack = new Stack<Candidate>();
-		var result = new HashSet<string>();
+		var result = new Dictionary<string, int>();
 
 		stack.Push(new Candidate("", 0, 0, CorrectionType.None));
 		
@@ -43,7 +43,7 @@ public class Vocabulary : IVocabulary
 		{
 			if (current.Index == input.Length && IsKnown(current.Word))
 			{
-				result.Add(current.Word);
+				result.Add(current.Word, current.EditsCount);
 				continue;
 			}
 			
@@ -65,14 +65,23 @@ public class Vocabulary : IVocabulary
 					stack.Push(new Candidate(child, current.Index + 1, current.EditsCount, CorrectionType.None));
 				}
 				
-				if (current.Index < input.Length &&  current.EditsCount < depth && current.CorrectionType != CorrectionType.Insert)
+				if (current.EditsCount < depth && current.CorrectionType != CorrectionType.Insert && current.Index <= input.Length)
 				{
 					stack.Push(new Candidate(child, current.Index, current.EditsCount + 1, CorrectionType.Insert));
 				}
 			}
 		}
 
-		return result.ToArray();
+		if (result.Count == 0)
+		{
+			return [];
+		}
+
+		var minEdits = result.Values.Min();
+		return result
+			.Where(x => x.Value == minEdits)
+			.Select(x => x.Key)
+			.ToArray();
 	}
 
 	public static Vocabulary BuildVocabulary(string[] knownWords)
@@ -85,9 +94,9 @@ public class Vocabulary : IVocabulary
 
 		foreach (var word in plainWords)
 		{
-			for (int j = 1; j < word.Length; j++)
+			for (int j = 1; j <= word.Length; j++)
 			{
-				var key = j < word.Length ? word[0..j] : word;
+				var key = word[0..j];
 				if (dictionary.ContainsKey(key)) continue;
 				
 				var parent = word[..(j - 1)];
