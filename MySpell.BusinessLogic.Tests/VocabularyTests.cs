@@ -3,6 +3,8 @@ namespace MySpell.BusinessLogic.Tests;
 [TestFixture]
 public class VocabularyTests
 {
+	private string[] _sharedDictionary = ["test", "testability", "testosterone", "bug", "on", "off"];
+	
 	[Test]
 	public void BuildTest()
 	{
@@ -20,15 +22,22 @@ public class VocabularyTests
 	}
 	
 	[TestCase("test", "test", "Exact match")]
-	[TestCase("tst", "test", "One insert case")]
-	[TestCase("teest", "test", "One delete case")]
+	[TestCase("tst", "test", "One middle insert case")]
+	[TestCase("est", "test", "First insert case")]
+	[TestCase("tes", "test", "Last insert case")]
+	[TestCase("teest", "test", "One middle delete case")]
+	[TestCase("xtest", "test", "First delete case")]
+	[TestCase("testy", "test", "Last delete case")]
+	[TestCase("tset", "test", "One delete and one insert case")]
 	public void GetBestMatchTest(string input, string candidate, string description)
 	{
-		var words = new string[] { "test", "testability", "testosterone", "bug", "on", "off", };
-		
-		var vocabulary = Vocabulary.BuildVocabulary(words);
-		var r = vocabulary.GetBestMatch(input,2 );
+		var vocabulary = Vocabulary.BuildVocabulary(_sharedDictionary);
+		var result = vocabulary.GetBestMatch(input,2 );
 
-		Assert.That(r.Contains(candidate));
+		Assert.Multiple(() =>
+		{
+			Assert.That(result.Length == 1, "Unexpected words found in result");
+			Assert.That(result.Contains(candidate), "The correction doesn't contain right correction");
+		});
 	}
 }
