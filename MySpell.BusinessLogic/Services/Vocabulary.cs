@@ -1,7 +1,6 @@
 using MySpell.BusinessLogic.Models;
-using MySpell.BusinessLogic.Services;
 
-namespace MySpell.BusinessLogic;
+namespace MySpell.BusinessLogic.Services;
 
 public class Vocabulary : IVocabulary
 {
@@ -16,7 +15,7 @@ public class Vocabulary : IVocabulary
 
 	public bool IsKnown(string word)
 	{
-		return _words.ContainsKey(word);
+		return !string.IsNullOrEmpty(word) && _words.ContainsKey(word.ToLowerInvariant());
 	}
 	
 	public string[] GetBestMatch(string input, int depth)
@@ -26,7 +25,7 @@ public class Vocabulary : IVocabulary
 			return [];
 		}
 		
-		if (IsKnown(input))
+		if (IsKnown(input.ToLowerInvariant()))
 		{
 			return [input];
 		}
@@ -59,7 +58,7 @@ public class Vocabulary : IVocabulary
 			
 			foreach (var child in children)
 			{
-				if (current.Index < input.Length && child[^1] == input[current.Index])
+				if (current.Index < input.Length && char.ToLowerInvariant(child[^1]) == char.ToLowerInvariant(input[current.Index]))
 				{
 					stack.Push(new Candidate(child, current.Index + 1, current.EditsCount, CorrectionType.None));
 				}
@@ -87,22 +86,20 @@ public class Vocabulary : IVocabulary
 	public static Vocabulary BuildVocabulary(string[] knownWords)
 	{
 		var words = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-		for (var i = 0; i < knownWords.Length; i++)
-		{
-			var word = knownWords[i];
-			if (words.TryAdd(word, i))
-			{
-				// Duplicate in vocabulary, we'll skip this for now.
-			};
-		}
-		
 		var dictionary = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
 		{
 			[""] = new List<string>()
 		};
-
-		foreach (var word in knownWords)
+		
+		for (var i = 0; i < knownWords.Length; i++)
 		{
+			var word = knownWords[i].Trim().ToLowerInvariant();
+			if (!words.TryAdd(word, i))
+			{
+				// Duplicate in vocabulary, we'll skip this for now.
+				continue;
+			};
+			
 			for (int j = 1; j <= word.Length; j++)
 			{
 				var key = word[0..j];
@@ -116,6 +113,7 @@ public class Vocabulary : IVocabulary
 				dictionary[parent].Add(key);
 				dictionary[key] = new List<string>();
 			}
+			
 		}
 
 		return new Vocabulary(words, dictionary);

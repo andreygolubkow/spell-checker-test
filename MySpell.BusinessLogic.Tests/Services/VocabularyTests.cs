@@ -1,3 +1,5 @@
+using MySpell.BusinessLogic.Services;
+
 namespace MySpell.BusinessLogic.Tests.Services;
 
 [TestFixture]
@@ -20,8 +22,9 @@ public class VocabularyTests
 	}
 	
 	[TestCase("test", "test", "Exact match")]
-	[TestCase("tEsT", "test", "Exact match case insensitive input side")]
-	[TestCase("case", "CaSe", "Exact match case insensitive vocabulary side")]
+	[TestCase("tEsT", "tEsT", "Exact match case same case output")]
+	[TestCase("case", "case", "Exact match case insensitive vocabulary side")]
+	[TestCase("tST", "test", "One insert different case word")]
 	[TestCase("tst", "test", "One middle insert case")]
 	[TestCase("est", "test", "First insert case")]
 	[TestCase("tes", "test", "Last insert case")]
