@@ -8,6 +8,9 @@ public class DataReader : IDataReader
 	private const char Separator = '=';
 	private const int BufferSize = 2048;
 	private readonly string? _path;
+	private readonly List<string[]> _sections = [];
+	private bool _sectionsLoaded;
+	private int _nextSectionIndex;
 	
 	public DataReader(string path)
 	{
@@ -21,14 +24,32 @@ public class DataReader : IDataReader
 			throw new InvalidOperationException("File path wasn't provided or file desn't exist");
 		}
 
-		return ReadWords(_path);
+		LoadSections();
+
+		if (_nextSectionIndex >= _sections.Count)
+		{
+			yield break;
+		}
+
+		foreach (var word in _sections[_nextSectionIndex])
+		{
+			yield return word;
+		}
+
+		_nextSectionIndex++;
 	}
 
-	private IEnumerable<string> ReadWords(string path)
+	private void LoadSections()
 	{
-		using var reader = new StreamReader(path);
+		if (_sectionsLoaded) return;
+
+		_sectionsLoaded = true;
+		
+		var currentSection = new List<string>();
 		var state = new ReaderState();
+		using var reader = new StreamReader(_path!);
 		var buffer = new char[BufferSize];
+		
 		int readCount;
 		
 		while ((readCount = reader.ReadBlock(buffer, 0, buffer.Length)) > 0)
@@ -42,48 +63,49 @@ public class DataReader : IDataReader
 					continue;
 				}
 
-				var (word, stopReading) = ProcessToken(state);
+				var separatorReached = ProcessToken(state, currentSection);
 				
-				if (word is not null)
-				{
-					yield return word;
-				}
+				if (!separatorReached) continue;
 
-				if (stopReading)
-				{
-					yield break;
-				}
+				if (currentSection.Count <= 0) continue;
+				
+				_sections.Add(currentSection.ToArray());
+				currentSection = new List<string>();
 			}
 		}
 
-		var (lastWord, endReading) = ProcessToken(state);
-		
-		if (lastWord is not null)
+		var endSeparatorReached = ProcessToken(state, currentSection);
+		if (endSeparatorReached && currentSection.Count > 0)
 		{
-			yield return lastWord;
+			_sections.Add(currentSection.ToArray());
+			return;
+		}
+
+		if (currentSection.Count > 0)
+		{
+			_sections.Add(currentSection.ToArray());
 		}
 	}
 
-	private (string? Word, bool StopReading) ProcessToken(ReaderState state)
+	private bool ProcessToken(ReaderState state, List<string> currentSection)
 	{
+		var separatorReached = false;
 		if (state.FullWord.Length == 0)
 		{
-			return (null, false);
+			return separatorReached;
 		}
 
 		if (IsSeparator(state.FullWord))
 		{
-			var stopReading = state.SeparatorReached;
-			state.SeparatorReached = true;
+			separatorReached = true;
 			state.FullWord.Clear();
-			
-			return (null, stopReading);
+			return separatorReached;
 		}
 
-		var word = state.FullWord.ToString();
+		currentSection.Add(state.FullWord.ToString());
 		state.FullWord.Clear();
-		
-		return (word, false);
+
+		return separatorReached;
 	}
 
 	private bool IsSeparator(StringBuilder letter)
