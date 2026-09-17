@@ -5,7 +5,11 @@ namespace MySpell.BusinessLogic.Tests.Services;
 [TestFixture]
 public class VocabularyTests
 {
-	private string[] _sharedWords = ["test", "CaSe"];
+	private List<string> _sharedWords = new List<string>()
+	{
+		"test",
+		"CaSe"
+	};
 	
 	[Test]
 	public void BuildTest()
@@ -49,7 +53,7 @@ public class VocabularyTests
 	[Test]
 	public void BestCorrectionWinsTest()
 	{
-		string[] words = ["taste", "test"];
+		var words = new List<string>() {"taste", "test"};
 		
 		var vocabulary = Vocabulary.BuildVocabulary(words);
 		
@@ -65,7 +69,10 @@ public class VocabularyTests
 	[Test]
 	public void FewBestCorrectionsTest()
 	{
-		string[] words = ["tost", "test", "toset"];
+		var words = new List<string>()
+		{
+			"tost", "test", "toset"
+		};
 		
 		var vocabulary = Vocabulary.BuildVocabulary(words);
 		

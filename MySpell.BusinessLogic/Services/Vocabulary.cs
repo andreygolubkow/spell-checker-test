@@ -83,18 +83,19 @@ public class Vocabulary : IVocabulary
 			.ToArray();
 	}
 
-	public static Vocabulary BuildVocabulary(string[] knownWords)
+	public static Vocabulary BuildVocabulary(List<string> knownWords)
 	{
 		var words = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 		var dictionary = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
 		{
 			[""] = new List<string>()
 		};
-		
-		for (var i = 0; i < knownWords.Length; i++)
+
+		var position = 0;
+		foreach (var originalWord in knownWords)
 		{
-			var word = knownWords[i].Trim().ToLowerInvariant();
-			if (!words.TryAdd(word, i))
+			var word = originalWord.Trim().ToLowerInvariant();
+			if (!words.TryAdd(word, position))
 			{
 				// Duplicate in vocabulary, we'll skip this for now.
 				continue;
@@ -113,7 +114,8 @@ public class Vocabulary : IVocabulary
 				dictionary[parent].Add(key);
 				dictionary[key] = new List<string>();
 			}
-			
+
+			position++;
 		}
 
 		return new Vocabulary(words, dictionary);
