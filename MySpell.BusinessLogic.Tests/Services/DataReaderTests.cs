@@ -23,9 +23,17 @@ public class DataReaderTests
 			File.WriteAllText(path,FEW_LINES_TEXT);
 			var reader = new DataReader(path);
 			
-			var result = reader.ReadFile().ToArray();
+			var vocabulary = reader.ReadFile().ToArray();
+			var inputText = reader.ReadFile().ToArray();
 			
-			Assert.That(result, Is.EqualTo(new[] { "test", "text", "TeSt", "one", "two", "three" }));
+			Assert.Multiple(() =>
+			{
+				Assert.That(vocabulary, 
+					Is.EqualTo(new[] { "test", "text", "TeSt" }), "Vocabulary is wrong");
+				Assert.That(inputText, 
+					Is.EqualTo(new[] { "one", "two", "three" }), "Input sentences are wrong");
+			});
+			
 		}
 		finally
 		{
