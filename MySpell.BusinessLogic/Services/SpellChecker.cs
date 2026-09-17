@@ -12,25 +12,32 @@ public class SpellChecker : ISpellChecker
 
 	public string ProcessWord(string word)
 	{
+		ArgumentNullException.ThrowIfNull(word);
+
 		if (HasUnsupportedChars(word))
 		{
 			throw new ArgumentException("The word contains unsupported symbols and cannot be checked");
 		}
 
-		// TODO
+		var lowerCaseWord = word.ToLowerInvariant();
+
+		if (_vocabulary.IsKnown(lowerCaseWord))
+		{
+			return word;
+		}
+
+		var corrections = _vocabulary.GetBestMatch(lowerCaseWord, 2);
 		
-		return word;
+		if (corrections.Length == 1)
+		{
+			return corrections[0];
+		}
+
+		return corrections.Length == 0 ? $"{{{word}?}}" : $"{{{string.Join(" ", corrections)}}}";
 	}
 	
 	private bool HasUnsupportedChars(string word)
 	{
-		foreach (var character in _unsupportedChars)
-		{
-			if (word.Contains(character))
-			{
-				return true;
-			}
-		}
-		return false;
+		return _unsupportedChars.Any(word.Contains);
 	}
 }

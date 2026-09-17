@@ -1,34 +1,64 @@
-﻿using MySpell.BusinessLogic.Services;
+﻿using Moq;
+using MySpell.BusinessLogic.Services;
 
 namespace MySpell.BusinessLogic.Tests.Services;
 
 [TestFixture]
 public class SpellCheckerTests
 {
-	const string CORRECT_PAIN = "pain";
-	const string FEW_CORRECTIONS_WORDS = "main mainly";
-	
-	// If W is in the dictionary, print it as is.
-	[TestCase(CORRECT_PAIN, CORRECT_PAIN)]
-	// Otherwise, if W is not in the dictionary,
-	// - If no corrections can be found, print “{W?}”.
-	[TestCase("rame", "{rame?}")]
-	// Ignore any corrections that require two edits / adjacent edits 
-	[TestCase("hints", "{hints?}")]
-	// If exactly one correction is left, print that word.
-	// One remove
-	[TestCase($"{CORRECT_PAIN}n", $"{CORRECT_PAIN}")]
-	// One insert
-	[TestCase($"pai", $"{CORRECT_PAIN}")]
-	// If more than one possible correction is left, print the set of corrections as “{W1
-	// W2 · · ·}”, in the order they appear in the dictionary.
-	[TestCase("mainy", $"{{{FEW_CORRECTIONS_WORDS}}}")]
-	public void Process_GeneralCases(string word, string expectedResult)
+	[Test]
+	public void ProcessKnownWordSaveCaseTest()
 	{
-		var instance = new SpellChecker(null);
+		var vocabulary = new Mock<IVocabulary>();
+		vocabulary.Setup(x => x.IsKnown(It.IsAny<string>()))
+			.Returns(true);
+			
+		var spellChecker = new SpellChecker(vocabulary.Object);
+		
+		var result = spellChecker.ProcessWord("Test");
 
-		var result = instance.ProcessWord(word);
+		Assert.That(result, Is.EqualTo("Test"));
+	}
 
-		Assert.That(result, Is.EqualTo(expectedResult));
+	[Test]
+	public void ProcessUnknownWordTest()
+	{
+		var vocabulary = new Mock<IVocabulary>();
+		vocabulary.Setup(x => x.IsKnown(It.IsAny<string>()))
+			.Returns(false);
+			
+		var spellChecker = new SpellChecker(vocabulary.Object);
+		
+		var result = spellChecker.ProcessWord("test");
+
+		Assert.That(result, Is.EqualTo("{test?}"));
+	}
+
+	[Test]
+	public void ProcessWordWithCorrectionTest()
+	{
+		var vocabulary = new Mock<IVocabulary>();
+		vocabulary.Setup(x => x.IsKnown(It.IsAny<string>()))
+			.Returns(false);
+		vocabulary.Setup(x => x.GetBestMatch(It.IsAny<string>(), It.IsAny<int>()))
+			.Returns(["corrected"]);
+		
+		var spellChecker = new SpellChecker(vocabulary.Object);
+		
+		var result = spellChecker.ProcessWord("test");
+
+		Assert.That(result, Is.EqualTo("corrected"));
+	}
+	
+	[Test]
+	public void ProcessUnsupportedCharsTest()
+	{
+		var vocabulary = Mock.Of<IVocabulary>();
+		var spellChecker = new SpellChecker(vocabulary);
+		
+		Assert.That(
+			() => spellChecker.ProcessWord("two words"), 
+			Throws.TypeOf<ArgumentException>()
+			);
 	}
 }
