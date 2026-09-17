@@ -9,16 +9,26 @@ class Program
 		var input = args != null && args.Length > 1 ? args[1] : "input.txt";
 		
 		var reader = new DataReader(input);
-		var words = new List<string>();
+		var words = reader.ReadFile().ToList();
+		
+		var vocabulary = Vocabulary.BuildVocabulary(words);
+		var spellChecker = new SpellChecker(vocabulary);
 
-		foreach (var w in reader.ReadFile())
+		var isFirst = true;
+		foreach (var word in reader.ReadFile())
 		{
-			words.Add(w);	
+			if (isFirst)
+			{
+				isFirst = false;
+			}
+			else
+			{
+				Console.Write(' ');
+			}
+			
+			var result = spellChecker.ProcessWord(word);
+			
+			Console.Write(result);
 		}
-		
-		
-
-
-
 	}
 }

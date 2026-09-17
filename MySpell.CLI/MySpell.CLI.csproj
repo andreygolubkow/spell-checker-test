@@ -11,4 +11,10 @@
       <ProjectReference Include="..\MySpell.BusinessLogic\MySpell.BusinessLogic.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="input.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
