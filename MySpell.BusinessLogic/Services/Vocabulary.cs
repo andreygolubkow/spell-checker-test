@@ -5,29 +5,34 @@ namespace MySpell.BusinessLogic;
 
 public class Vocabulary : IVocabulary
 {
-	private readonly HashSet<string> _plainWords;
-	private readonly IDictionary<string, List<string>> _dictionary;
+	private readonly Dictionary<string, int> _words;
+	private readonly Dictionary<string, List<string>> _dictionary;
 	
-	public Vocabulary(HashSet<string> plainWords, IDictionary<string,List<string>> dictionary)
+	public Vocabulary(Dictionary<string, int> words, Dictionary<string, List<string>> dictionary)
 	{
-		_plainWords = plainWords;
+		_words = words;
 		_dictionary = dictionary;
 	}
 
 	public bool IsKnown(string word)
 	{
-		return _plainWords.Contains(word);
+		return _words.ContainsKey(word);
 	}
 	
 	public string[] GetBestMatch(string input, int depth)
 	{
+		if (string.IsNullOrEmpty(input))
+		{
+			return [];
+		}
+		
 		if (IsKnown(input))
 		{
 			return [input];
 		}
 		
 		var stack = new Stack<Candidate>();
-		var result = new Dictionary<string, int>();
+		var result = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
 		stack.Push(new Candidate("", 0, 0, CorrectionType.None));
 		
@@ -35,8 +40,7 @@ public class Vocabulary : IVocabulary
 		{
 			if (current.Index == input.Length && IsKnown(current.Word))
 			{
-				if (!result.TryGetValue(current.Word, out var existingEdits) || 
-					current.EditsCount < existingEdits)
+				if (!result.TryGetValue(current.Word, out var existingEdits) || current.EditsCount < existingEdits)
 				{
 					result[current.Word] = current.EditsCount;
 				}
@@ -48,8 +52,7 @@ public class Vocabulary : IVocabulary
 				continue;
 			}
 			
-			if (current.Index < input.Length && current.EditsCount < depth 
-			                                 && current.CorrectionType == CorrectionType.None)
+			if (current.Index < input.Length && current.EditsCount < depth && current.CorrectionType == CorrectionType.None)
 			{
 				stack.Push(new Candidate(current.Word, current.Index + 1, current.EditsCount + 1, CorrectionType.Delete));
 			}
@@ -61,8 +64,7 @@ public class Vocabulary : IVocabulary
 					stack.Push(new Candidate(child, current.Index + 1, current.EditsCount, CorrectionType.None));
 				}
 				
-				if (current.EditsCount < depth && current.Index <= input.Length 
-				                               && current.CorrectionType == CorrectionType.None)
+				if (current.EditsCount < depth && current.Index <= input.Length && current.CorrectionType == CorrectionType.None)
 				{
 					stack.Push(new Candidate(child, current.Index, current.EditsCount + 1, CorrectionType.Insert));
 				}
@@ -77,19 +79,29 @@ public class Vocabulary : IVocabulary
 		var minEdits = result.Values.Min();
 		return result
 			.Where(x => x.Value == minEdits)
+			.OrderBy(x => _words[x.Key])
 			.Select(x => x.Key)
 			.ToArray();
 	}
 
 	public static Vocabulary BuildVocabulary(string[] knownWords)
 	{
-		var plainWords = new HashSet<string>(knownWords);
-		IDictionary<string, List<string>> dictionary = new Dictionary<string, List<string>>()
+		var words = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+		for (var i = 0; i < knownWords.Length; i++)
+		{
+			var word = knownWords[i];
+			if (words.TryAdd(word, i))
+			{
+				// Duplicate in vocabulary, we'll skip this for now.
+			};
+		}
+		
+		var dictionary = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
 		{
 			[""] = new List<string>()
 		};
 
-		foreach (var word in plainWords)
+		foreach (var word in knownWords)
 		{
 			for (int j = 1; j <= word.Length; j++)
 			{
@@ -97,11 +109,15 @@ public class Vocabulary : IVocabulary
 				if (dictionary.ContainsKey(key)) continue;
 				
 				var parent = word[..(j - 1)];
+				if (!dictionary.ContainsKey(parent))
+				{
+					dictionary[parent] = new List<string>();
+				}
 				dictionary[parent].Add(key);
 				dictionary[key] = new List<string>();
 			}
 		}
 
-		return new Vocabulary(plainWords, dictionary);
+		return new Vocabulary(words, dictionary);
 	}
 }

@@ -3,7 +3,7 @@ namespace MySpell.BusinessLogic.Tests.Services;
 [TestFixture]
 public class VocabularyTests
 {
-	private string[] _sharedWords = ["test"];
+	private string[] _sharedWords = ["test", "CaSe"];
 	
 	[Test]
 	public void BuildTest()
@@ -20,6 +20,8 @@ public class VocabularyTests
 	}
 	
 	[TestCase("test", "test", "Exact match")]
+	[TestCase("tEsT", "test", "Exact match case insensitive input side")]
+	[TestCase("case", "CaSe", "Exact match case insensitive vocabulary side")]
 	[TestCase("tst", "test", "One middle insert case")]
 	[TestCase("est", "test", "First insert case")]
 	[TestCase("tes", "test", "Last insert case")]
