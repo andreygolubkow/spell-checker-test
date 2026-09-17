@@ -89,23 +89,21 @@ public class DataReader : IDataReader
 
 	private bool ProcessToken(ReaderState state, List<string> currentSection)
 	{
-		var separatorReached = false;
 		if (state.FullWord.Length == 0)
 		{
-			return separatorReached;
+			return false;
 		}
 
 		if (IsSeparator(state.FullWord))
 		{
-			separatorReached = true;
 			state.FullWord.Clear();
-			return separatorReached;
+			return true;
 		}
 
 		currentSection.Add(state.FullWord.ToString());
 		state.FullWord.Clear();
 
-		return separatorReached;
+		return false;
 	}
 
 	private bool IsSeparator(StringBuilder letter)
