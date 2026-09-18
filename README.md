@@ -1,5 +1,7 @@
 # MY SPELL PROJECT
 
+`.net10`
+
 # HOW TO RUN?
 
 Use `MySpell.CLI`. 
