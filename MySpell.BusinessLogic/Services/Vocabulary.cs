@@ -4,10 +4,10 @@ namespace MySpell.BusinessLogic.Services;
 
 public class Vocabulary : IVocabulary
 {
-	private readonly Dictionary<string, int> _words;
+	private readonly Dictionary<string, (int Order, string OriginalWord)> _words;
 	private readonly Dictionary<string, List<string>> _dictionary;
 	
-	public Vocabulary(Dictionary<string, int> words, Dictionary<string, List<string>> dictionary)
+	public Vocabulary(Dictionary<string, (int Order, string OriginalWord)> words, Dictionary<string, List<string>> dictionary)
 	{
 		_words = words;
 		_dictionary = dictionary;
@@ -78,14 +78,14 @@ public class Vocabulary : IVocabulary
 		var minEdits = result.Values.Min();
 		return result
 			.Where(x => x.Value == minEdits)
-			.OrderBy(x => _words[x.Key])
-			.Select(x => x.Key)
+			.OrderBy(x => _words[x.Key].Order)
+			.Select(x => _words[x.Key].OriginalWord)
 			.ToArray();
 	}
 
 	public static Vocabulary BuildVocabulary(List<string> knownWords)
 	{
-		var words = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+		var words = new Dictionary<string, (int Order, string OriginalWord)>(StringComparer.OrdinalIgnoreCase);
 		var dictionary = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
 		{
 			[""] = new List<string>()
@@ -95,7 +95,7 @@ public class Vocabulary : IVocabulary
 		foreach (var originalWord in knownWords)
 		{
 			var word = originalWord.Trim().ToLowerInvariant();
-			if (!words.TryAdd(word, position))
+			if (!words.TryAdd(word, (position, originalWord)))
 			{
 				// Duplicate in vocabulary, we'll skip this for now.
 				continue;
