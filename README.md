@@ -2,6 +2,10 @@
 
 `.net10`
 
+- `MySpell.BusinessLogic` - business logic of the solution, including file reading
+- `MySpell.BusinessLogic.Tests` - unit tests of business logic
+- `MySpell.CLI` - executable file, accepts file, sends output to stdout 
+
 # HOW TO RUN?
 
 Use `MySpell.CLI`. 
