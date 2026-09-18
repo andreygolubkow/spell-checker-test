@@ -2,6 +2,10 @@ using MySpell.BusinessLogic.Models;
 
 namespace MySpell.BusinessLogic.Services;
 
+/// <summary>
+/// Checks the word using internal vocabulary.
+/// Provides original word or corrected word or possible corrections.
+/// </summary>
 public class Vocabulary : IVocabulary
 {
 	private readonly Dictionary<string, (int Order, string OriginalWord)> _words;
@@ -51,7 +55,7 @@ public class Vocabulary : IVocabulary
 				continue;
 			}
 			
-			if (current.Index < input.Length && current.EditsCount < depth && current.CorrectionType == CorrectionType.None)
+			if (current.Index < input.Length && current.EditsCount < depth && current.CorrectionType != CorrectionType.Delete)
 			{
 				stack.Push(new Candidate(current.Word, current.Index + 1, current.EditsCount + 1, CorrectionType.Delete));
 			}
@@ -63,7 +67,7 @@ public class Vocabulary : IVocabulary
 					stack.Push(new Candidate(child, current.Index + 1, current.EditsCount, CorrectionType.None));
 				}
 				
-				if (current.EditsCount < depth && current.Index <= input.Length && current.CorrectionType == CorrectionType.None)
+				if (current.EditsCount < depth && current.Index <= input.Length && current.CorrectionType != CorrectionType.Insert)
 				{
 					stack.Push(new Candidate(child, current.Index, current.EditsCount + 1, CorrectionType.Insert));
 				}

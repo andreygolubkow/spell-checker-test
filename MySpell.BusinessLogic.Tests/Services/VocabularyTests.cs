@@ -85,8 +85,7 @@ public class VocabularyTests
 			Assert.That(result.Contains("tost"));
 		});
 	}
-
-	[TestCase("tzst")]
+	
 	[TestCase("aatest")]
 	[TestCase("testaa")]
 	[TestCase("st")]

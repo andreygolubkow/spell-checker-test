@@ -1,5 +1,9 @@
 namespace MySpell.BusinessLogic.Services;
 
+/// <summary>
+/// Checks the word in vocabulary.
+/// Formats the output.
+/// </summary>
 public class SpellChecker : ISpellChecker
 {
 	private readonly IVocabulary _vocabulary;

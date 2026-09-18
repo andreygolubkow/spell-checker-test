@@ -13,6 +13,19 @@ You can put your input in `input.txt`, or pass file path as an argument.
 
 The output you'll see in console.
 
+# HOW IT WORKS ?
+
+```mermaid
+flowchart TD
+    A[Reading vocabulary from file] -->|using DataReader| B(Building Vocabulary)
+    B --> C(Reading one word)
+    C --> D(Spell Check and correct if needed)
+    D --> E(Print the word)
+    E --> F{next word?}
+    F --> | yes| C
+    F --> |file finished| G(exit)
+```
+
 # QUESTIONS
 
 1. Can we consider the input consists of A-Z, a-z, and single spaces, and '===' separator ? Should we support other characters/languages? Linebreaks ? 

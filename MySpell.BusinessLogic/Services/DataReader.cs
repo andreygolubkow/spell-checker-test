@@ -3,6 +3,9 @@ using MySpell.BusinessLogic.Models;
 
 namespace MySpell.BusinessLogic.Services;
 
+/// <summary>
+/// Allows to read very big files little by little, without putting all the content in memory.
+/// </summary>
 public class DataReader : IDataReader
 {
 	private const char Separator = '=';
@@ -17,6 +20,12 @@ public class DataReader : IDataReader
 		_path = path;
 	}
 	
+	/// <summary>
+	/// Two enumerations.
+	/// First - vocabulary.
+	/// Second - text to correct.
+	/// </summary>
+	/// <exception cref="InvalidOperationException">When we don't have file</exception>
 	public IEnumerable<string> ReadFile()
 	{
 		if (string.IsNullOrWhiteSpace(_path) || !File.Exists(_path))
